@@ -2,6 +2,7 @@ import requests
 import allure
 from config import BASE_URL, COURIER_URL
 import helper
+import config
 
 class CourierMethods:
 
@@ -34,19 +35,19 @@ class CourierMethods:
     def create_courier_again(self, login, password, first_name):
         status_code,result_json = self.create_new_courier({"login":login,"password":password,"first_name":first_name})
         assert status_code == 409
-        assert result_json['message'] == 'Этот логин уже используется. Попробуйте другой.'
+        assert result_json['message'] == config.LOGIN_IS_ALREADY_IN_USE
 
     @allure.step('Попытка создания курьера без login')
     def create_courier_without_login(self, password, first_name):
         status_code,result_json = self.create_new_courier({"password":password,"first_name":first_name})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для создания учетной записи'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_CREATE_ACCOUNT
 
     @allure.step('Попытка создания курьера без password')
     def create_courier_without_password(self, login, first_name):
         status_code, result_json = self.create_new_courier({"login": login, "first_name": first_name})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для создания учетной записи'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_CREATE_ACCOUNT
 
     @allure.step('Попытка создания курьера без first_name')
     def create_courier_without_first_name(self, login, password):
@@ -59,14 +60,14 @@ class CourierMethods:
     def create_courier_with_empty_login(self, login, password, first_name):
         status_code, result_json=self.create_new_courier({"login":login, "password":password,"first_name":first_name})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для создания учетной записи'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_CREATE_ACCOUNT
 
     @allure.step('Попытка создания курьера с пустым password')
     def create_courier_with_empty_password(self, login, password, first_name):
         status_code, result_json = self.create_new_courier(
             {"login": login, "password": password, "first_name": first_name})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для создания учетной записи'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_CREATE_ACCOUNT
 
     @allure.step('Попытка создания курьера с пустым first_name')
     def create_courier_with_empty_first_name(self, login, password, first_name):
@@ -79,31 +80,29 @@ class CourierMethods:
 
     @allure.step('Попытка авторизации курьера с пустым login')
     def login_courier_without_login_field(self, password):
-        status_code, result_json = self.login_existing_courier(
-            {"login": "", "password": password})
-        print('login', status_code, result_json)
+        status_code, result_json = self.login_existing_courier({"login": "", "password": password})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для входа'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_LOGIN
 
     @allure.step('Попытка авторизации курьера с пустым password')
     def login_courier_without_password_field(self, login):
         status_code, result_json = self.login_existing_courier(
             {"login": login, "password": ""})
         assert status_code == 400
-        assert result_json['message'] == 'Недостаточно данных для входа'
+        assert result_json['message'] == config.NOT_ENOUGH_DATA_TO_LOGIN
 
 
     @allure.step('Попытка авторизации курьера с некорректным login')
     def login_courier_with_incorrect_login_field(self, login, password):
         status_code, result_json = self.login_existing_courier({"login": login, "password": password})
         assert status_code == 404
-        assert result_json['message'] == 'Учетная запись не найдена'
+        assert result_json['message'] == config.ACCOUNT_NOT_FOUND
 
     @allure.step('Попытка авторизации курьера с некорретным password')
     def login_courier_with_incorrect_password_field(self, login, password):
         status_code, result_json = self.login_existing_courier({"login": login, "password": password})
         assert status_code == 404
-        assert result_json['message'] == 'Учетная запись не найдена'
+        assert result_json['message'] == config.ACCOUNT_NOT_FOUND
 
 
     def delete_courier_by_login(self, login, password):

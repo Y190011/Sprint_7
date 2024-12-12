@@ -13,6 +13,7 @@ class OrderMethods:
         assert response.json()['track'] is not None
         return response.json()['track']
 
+
     @allure.title("Чтение заказа")
     def get_order(self, order_track):
         response = requests.get(f'{BASE_URL}{ORDER_URL}track?t={order_track}')
@@ -27,12 +28,13 @@ class OrderMethods:
 
     @allure.title("Тест на создание, чтение и прием заказа курьером")
     def create_and_accept_order(self, courier_id, order_data):
+        print('order_data', order_data)
         track = self.post_order(order_data)
         order_id = self.get_order(track)
         self.accept_order(courier_id, order_id)
-        return track
+        return order_id
 
     @allure.title("Получение списка заказов для курьера")
     def get_order_list(self, courier_id):
-        response = requests.get(f'{BASE_URL}orders?courierId={courier_id}')
+        response = requests.get(f"{BASE_URL}orders?courierId={courier_id}")
         return response.json()
